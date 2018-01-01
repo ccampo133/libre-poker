@@ -1,6 +1,7 @@
 buildscript {
   ext {
     kotlinVersion = '1.2.0'
+    junitVersion = '4.11'
   }
   repositories {
     mavenCentral()
@@ -21,4 +22,9 @@ repositories {
 
 dependencies {
   compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+  testCompile "junit:junit:$junitVersion"
+  testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
 }
+
+test.testClassesDir = project.tasks.compileTestKotlin.destinationDir
+
