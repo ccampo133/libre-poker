@@ -1,6 +1,5 @@
 package me.ccampo.librepoker.model
 
-import me.ccampo.librepoker.util.evaluate
 import me.ccampo.librepoker.util.random
 
 /**
@@ -9,7 +8,16 @@ import me.ccampo.librepoker.util.random
 enum class Suit {
   CLUBS, DIAMONDS, HEARTS, SPADES;
 
-  fun toChar() = this.name.first().toLowerCase()
+  val char = this.name.first().toLowerCase()
+
+  val unicodeChar: Char
+    get() = when {
+      this == CLUBS -> '\u2667'
+      this == DIAMONDS -> '\u2662'
+      this == HEARTS -> '\u2661'
+      this == SPADES -> '\u2664'
+      else -> throw IllegalStateException() // This is impossible
+    }
 }
 
 enum class Face(val weight: Int) {
@@ -27,8 +35,8 @@ enum class Face(val weight: Int) {
   KING(13),
   ACE(14);
 
-  fun toChar(): Char {
-    return when {
+  val char: Char
+    get() = when {
       this == TEN -> 'T'
       this == JACK -> 'J'
       this == QUEEN -> 'Q'
@@ -36,7 +44,6 @@ enum class Face(val weight: Int) {
       this == ACE -> 'A'
       else -> Character.forDigit(this.weight, 10)
     }
-  }
 }
 
 enum class HandType(val rank: Int) {
@@ -50,6 +57,10 @@ enum class HandType(val rank: Int) {
   TWO_PAIR(2),
   PAIR(1),
   HIGH_CARD(0)
+}
+
+data class HandScore(val type: HandType, val score: Int) : Comparable<HandScore> {
+  override fun compareTo(other: HandScore) = score.compareTo(other.score)
 }
 
 data class Card(val face: Face, val suit: Suit) {
@@ -115,7 +126,8 @@ data class Card(val face: Face, val suit: Suit) {
     val ACE_OF_SPADES = Card(Face.ACE, Suit.SPADES)
   }
 
-  fun toShortString() = "${this.face.toChar()}${this.suit.toChar()}"
+  fun toShortString() = "${this.face.char}${this.suit.char}"
+  fun toUnicodeShortString() = "${this.face.char}${this.suit.unicodeChar}"
 }
 
 class Deck {

@@ -1,25 +1,35 @@
 package me.ccampo.librepoker.model
 
-import me.ccampo.librepoker.util.HandTypeAndScore
 import me.ccampo.librepoker.util.evaluate
 
 /**
  * @author Chris Campo
  */
 data class Hand(val cards: List<Card>) : Comparable<Hand> {
-  init {
-    require(cards.distinct().size == cards.size)
+  companion object {
+    const val NUM_CARDS = 5
   }
 
-  val type: HandType by lazy { evaluate(this) }
-  val score: Int by lazy { me.ccampo.librepoker.util.score(this) }
-  val scoreString: String by lazy { Integer.toHexString(score) }
+  init {
+    require(cards.distinct().size == cards.size && cards.size == NUM_CARDS)
+  }
+
+  //TODO: property for description of hand (e.g. "Aces full of Kings") -ccampo 2017-12-30
+  val score: HandScore by lazy { evaluate(this) }
 
   fun toShortString() = cards.map { it.toShortString() }.toString()
 
-  override fun compareTo(other: Hand): Int {
-    return this.score.compareTo(other.score)
+  fun toUnicodeShortString() = cards.map { it.toUnicodeShortString() }.toString()
+
+  fun isFlush() = this.cards.distinctBy { it.suit }.size == 1
+
+  fun isStraight(): Boolean {
+    val sorted = this.cards.sortedBy { it.face.weight }
+    val increasing = { i: Int -> sorted[0].face.weight + i == sorted[i].face.weight }
+    if (increasing(sorted.size - 1)) return true
+    // Ace can be either high or low
+    return sorted.last().face == Face.ACE && increasing(sorted.size - 2)
   }
 
-  //TODO: description of hand (e.g. "Aces full of Kings") -ccampo 2017-12-30
+  override fun compareTo(other: Hand): Int = this.score.compareTo(other.score)
 }

@@ -2,6 +2,7 @@ package me.ccampo.librepoker.model
 
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 /**
@@ -19,7 +20,7 @@ class HandTest {
       listOf(Card.ACE_OF_SPADES, Card.ACE_OF_DIAMONDS, Card.KING_OF_CLUBS, Card.FOUR_OF_SPADES, Card.FIVE_OF_HEARTS)
     )
 
-    assertEquals(h1.type, h2.type)
+    assertEquals(h1.score.type, h2.score.type)
     assertTrue { h1.compareTo(h2) == 0 }
   }
 
@@ -33,7 +34,7 @@ class HandTest {
       listOf(Card.ACE_OF_SPADES, Card.ACE_OF_DIAMONDS, Card.QUEEN_OF_SPADES, Card.SIX_OF_CLUBS, Card.FIVE_OF_CLUBS)
     )
 
-    assertEquals(h1.type, h2.type)
+    assertEquals(h1.score.type, h2.score.type)
     assertTrue { h1 > h2 }
   }
 
@@ -47,7 +48,7 @@ class HandTest {
       listOf(Card.DEUCE_OF_CLUBS, Card.THREE_OF_SPADES, Card.THREE_OF_CLUBS, Card.FOUR_OF_DIAMONDS, Card.SIX_OF_HEARTS)
     )
 
-    assertEquals(h1.type, h2.type)
+    assertEquals(h1.score.type, h2.score.type)
     assertTrue { h1 < h2 }
   }
 
@@ -61,7 +62,7 @@ class HandTest {
       listOf(Card.KING_OF_SPADES, Card.KING_OF_DIAMONDS, Card.KING_OF_CLUBS, Card.KING_OF_HEARTS, Card.FOUR_OF_HEARTS)
     )
 
-    assertEquals(h1.type, h2.type)
+    assertEquals(h1.score.type, h2.score.type)
     assertTrue { h1 > h2 }
   }
 
@@ -75,7 +76,7 @@ class HandTest {
       listOf(Card.ACE_OF_SPADES, Card.ACE_OF_DIAMONDS, Card.ACE_OF_CLUBS, Card.ACE_OF_HEARTS, Card.SIX_OF_CLUBS)
     )
 
-    assertEquals(h1.type, h2.type)
+    assertEquals(h1.score.type, h2.score.type)
     assertTrue { h1 < h2 }
   }
 
@@ -89,7 +90,7 @@ class HandTest {
       listOf(Card.ACE_OF_SPADES, Card.ACE_OF_DIAMONDS, Card.ACE_OF_CLUBS, Card.ACE_OF_HEARTS, Card.SIX_OF_CLUBS)
     )
 
-    assertEquals(h1.type, h2.type)
+    assertEquals(h1.score.type, h2.score.type)
     assertTrue { h1.compareTo(h2) == 0 }
   }
 
@@ -103,7 +104,7 @@ class HandTest {
       listOf(Card.KING_OF_SPADES, Card.KING_OF_DIAMONDS, Card.KING_OF_CLUBS, Card.FIVE_OF_SPADES, Card.FIVE_OF_CLUBS)
     )
 
-    assertEquals(h1.type, h2.type)
+    assertEquals(h1.score.type, h2.score.type)
     assertTrue { h1 > h2 }
   }
 
@@ -117,7 +118,7 @@ class HandTest {
       listOf(Card.ACE_OF_SPADES, Card.ACE_OF_DIAMONDS, Card.ACE_OF_CLUBS, Card.FIVE_OF_SPADES, Card.FIVE_OF_CLUBS)
     )
 
-    assertEquals(h1.type, h2.type)
+    assertEquals(h1.score.type, h2.score.type)
     assertTrue { h1 < h2 }
   }
 
@@ -131,7 +132,7 @@ class HandTest {
       listOf(Card.ACE_OF_SPADES, Card.ACE_OF_DIAMONDS, Card.ACE_OF_CLUBS, Card.FOUR_OF_SPADES, Card.FOUR_OF_DIAMONDS)
     )
 
-    assertEquals(h1.type, h2.type)
+    assertEquals(h1.score.type, h2.score.type)
     assertTrue { h1.compareTo(h2) == 0 }
   }
 
@@ -145,7 +146,10 @@ class HandTest {
       listOf(Card.TEN_OF_CLUBS, Card.TEN_OF_DIAMONDS, Card.ACE_OF_CLUBS, Card.FOUR_OF_SPADES, Card.FOUR_OF_CLUBS)
     )
 
-    assertEquals(h1.type, h2.type)
+    assertNotNull(h1.score)
+    assertNotNull(h2.score)
+
+    assertEquals(h1.score.type, h2.score.type)
     assertTrue { h1 > h2 }
   }
 }

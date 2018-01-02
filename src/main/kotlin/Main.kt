@@ -1,45 +1,72 @@
 import me.ccampo.librepoker.model.Card
 import me.ccampo.librepoker.model.Deck
 import me.ccampo.librepoker.model.Hand
+import me.ccampo.librepoker.model.Pocket
+import me.ccampo.librepoker.util.getBestHand
+import java.lang.Thread.yield
 
 fun main(args: Array<String>) {
   val numPlayers = 4
   val deck = Deck()
   var muck = listOf<Card>()
-  var hands = listOf<Hand>()
+  var pockets = listOf<Pocket>()
   var communityCards = listOf<Card>()
 
-  (0 until numPlayers).forEach { hands += Hand(emptyList()) }
+  (0 until numPlayers).forEach { pockets += Pocket(emptyList()) }
 
-  // Deal player their hands
+  // Deal player their cards
   (0 until 2).forEach {
-    hands = hands.map { it.copy(cards = it.cards + deck.draw()) }
+    pockets = pockets.map { it.copy(cards = it.cards + deck.draw()) }
   }
 
   // Flop
   muck += deck.draw()
-  communityCards += listOf(deck.draw(), deck.draw(), deck.draw())
+  val flop = listOf(deck.draw(), deck.draw(), deck.draw())
+  communityCards += flop
   println("Flop")
-  printCards(communityCards)
+  printCards(flop)
   println()
 
   // Turn
   muck += deck.draw()
-  communityCards += deck.draw()
+  val turn = deck.draw()
+  communityCards += turn
   println("Turn")
-  printCards(communityCards)
+  printCards(listOf(turn))
   println()
 
   // River
   muck += deck.draw()
-  communityCards += deck.draw()
+  val river = deck.draw()
+  communityCards += river
   println("River")
+  printCards(listOf(river))
+  println()
+
+  // Final board
+  println("Board")
   printCards(communityCards)
   println()
 
-  hands.map { it.copy(cards = it.cards + communityCards) }
-    .forEach { println("${it.toShortString()} - ${it.type}") }
+  var hands = emptyList<Hand>()
+  for ((i, pocket) in pockets.withIndex()) {
+    val hand = getBestHand(pocket.cards + communityCards)
+    println("Player $i - ${pocket.toUnicodeShortString()}: ${hand.toUnicodeShortString()} - ${hand.score.type}")
+    hands += hand
+  }
+  println()
+
+  val (winner, winningHand) = hands.withIndex().maxBy { it.value.score }!!
+
+  if (hands.count { it.score.score == winningHand.score.score } > 1) {
+    println("Tie")
+    hands.withIndex()
+      .filter { it.value.score.score == winningHand.score.score }
+      .forEach { println("Player ${it.index} wins! ${it.value.toUnicodeShortString()} - ${it.value.score.type}") }
+  } else {
+    println("Player $winner wins! ${winningHand.toUnicodeShortString()} - ${winningHand.score.type}")
+  }
 }
 
 
-fun printCards(cards: List<Card>) = println(cards.map { it.toShortString() })
+fun printCards(cards: List<Card>) = println(cards.map { it.toUnicodeShortString() })
