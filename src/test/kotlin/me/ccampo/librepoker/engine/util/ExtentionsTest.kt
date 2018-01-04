@@ -1,4 +1,4 @@
-package me.ccampo.librepoker.util
+package me.ccampo.librepoker.engine.util
 
 import org.junit.Test
 

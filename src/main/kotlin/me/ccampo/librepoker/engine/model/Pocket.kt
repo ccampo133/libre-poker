@@ -1,4 +1,4 @@
-package me.ccampo.librepoker.model
+package me.ccampo.librepoker.engine.model
 
 /**
  * @author Chris Campo

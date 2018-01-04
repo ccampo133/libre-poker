@@ -1,6 +1,6 @@
-package me.ccampo.librepoker.model
+package me.ccampo.librepoker.engine.model
 
-import me.ccampo.librepoker.util.evaluate
+import me.ccampo.librepoker.engine.util.evaluate
 
 /**
  * @author Chris Campo

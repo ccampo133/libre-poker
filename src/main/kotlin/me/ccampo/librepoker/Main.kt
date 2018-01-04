@@ -1,9 +1,10 @@
-import me.ccampo.librepoker.model.Card
-import me.ccampo.librepoker.model.Deck
-import me.ccampo.librepoker.model.Hand
-import me.ccampo.librepoker.model.Pocket
-import me.ccampo.librepoker.util.getBestHand
-import java.lang.Thread.yield
+package me.ccampo.librepoker
+
+import me.ccampo.librepoker.engine.model.Card
+import me.ccampo.librepoker.engine.model.Deck
+import me.ccampo.librepoker.engine.model.Hand
+import me.ccampo.librepoker.engine.model.Pocket
+import me.ccampo.librepoker.engine.util.getBestHand
 
 fun main(args: Array<String>) {
   val numPlayers = 4

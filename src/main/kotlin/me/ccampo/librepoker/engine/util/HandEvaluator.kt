@@ -1,9 +1,9 @@
-package me.ccampo.librepoker.util
+package me.ccampo.librepoker.engine.util
 
-import me.ccampo.librepoker.model.Card
-import me.ccampo.librepoker.model.Hand
-import me.ccampo.librepoker.model.HandScore
-import me.ccampo.librepoker.model.HandType
+import me.ccampo.librepoker.engine.model.Card
+import me.ccampo.librepoker.engine.model.Hand
+import me.ccampo.librepoker.engine.model.HandScore
+import me.ccampo.librepoker.engine.model.HandType
 
 /**
  * @author Chris Campo
@@ -48,3 +48,21 @@ fun evaluate(hand: Hand): HandScore {
 fun getBestHand(cards: List<Card>): Hand {
   return cards.combinations(5).map { Hand(it) }.maxBy { it.score.score }!!
 }
+
+private fun <T> List<T>.combinations(n: Int): List<List<T>> {
+  fun <T> combinations(l: List<T>, n: Int): List<List<T>> {
+    val result = mutableListOf<List<T>>()
+    when {
+      n > l.size -> throw IllegalArgumentException("Value n must be less than or equal to the list size")
+      n == l.size -> result.add(l)
+      n == 0 -> result.add(emptyList())
+      n < l.size -> result.addAll(combinations(l.tail, n) + combinations(l.tail, n - 1).map { it + l.head })
+    }
+    return result
+  }
+  return combinations(this, n)
+}
+
+private val <T> List<T>.tail: List<T> get() = drop(1)
+
+private val <T> List<T>.head: T get() = first()
