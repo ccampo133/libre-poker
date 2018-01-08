@@ -45,6 +45,16 @@ fun evaluate(hand: Hand): HandScore {
   return HandScore(type, score)
 }
 
+fun sort(cards: List<Card>): List<Card> {
+  return cards
+    .sortedByDescending { it.face.weight }
+    .groupBy { it.face }
+    .toSortedMap(compareByDescending { it.weight })
+    .values
+    .sortedByDescending { it.size }
+    .flatten()
+}
+
 fun getBestHand(cards: List<Card>): Hand {
   return cards.combinations(5).map { Hand(it) }.maxBy { it.score.score }!!
 }

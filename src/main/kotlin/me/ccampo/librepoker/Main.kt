@@ -1,73 +1,107 @@
 package me.ccampo.librepoker
 
-import me.ccampo.librepoker.engine.model.Card
-import me.ccampo.librepoker.engine.model.Deck
-import me.ccampo.librepoker.engine.model.Hand
-import me.ccampo.librepoker.engine.model.Pocket
-import me.ccampo.librepoker.engine.util.getBestHand
+import me.ccampo.librepoker.engine.model.*
+import me.ccampo.librepoker.engine.util.sort
 
 fun main(args: Array<String>) {
-  val numPlayers = 4
-  val deck = Deck()
-  var muck = listOf<Card>()
-  var pockets = listOf<Pocket>()
-  var communityCards = listOf<Card>()
+  println("Your name?")
+  val user = Player(readLine()!!.capitalize(), chips = 5000)
+  val players = listOf(user, Player("Ana", chips = 5000), Player("Evelyn", chips = 5000))
 
-  (0 until numPlayers).forEach { pockets += Pocket(emptyList()) }
+  println()
+  println("${players.size} players! ${players.joinToString { "${it.name} (chips: ${it.chips})" }}")
+  println()
 
-  // Deal player their cards
-  (0 until 2).forEach {
-    pockets = pockets.map { it.copy(cards = it.cards + deck.draw()) }
+  val game = HoldemGame(
+    players = players,
+    bigBlind = 100,
+    onBet = betWithUser(user),
+    onPreFlop = ::printPreFlop,
+    onFlop = ::printFlop,
+    onTurn = ::printTurn,
+    onRiver = ::printRiver,
+    onShowdown = ::printBoard
+  )
+
+  val winners = game.deal()
+
+  println("The pot: ${game.pot}")
+  println()
+
+  println("Winners")
+  if (winners.size > 1) {
+    println("${winners.size}-way split pot")
   }
 
-  // Flop
-  muck += deck.draw()
-  val flop = listOf(deck.draw(), deck.draw(), deck.draw())
-  communityCards += flop
-  println("Flop")
-  printCards(flop)
-  println()
-
-  // Turn
-  muck += deck.draw()
-  val turn = deck.draw()
-  communityCards += turn
-  println("Turn")
-  printCards(listOf(turn))
-  println()
-
-  // River
-  muck += deck.draw()
-  val river = deck.draw()
-  communityCards += river
-  println("River")
-  printCards(listOf(river))
-  println()
-
-  // Final board
-  println("Board")
-  printCards(communityCards)
-  println()
-
-  var hands = emptyList<Hand>()
-  for ((i, pocket) in pockets.withIndex()) {
-    val hand = getBestHand(pocket.cards + communityCards)
-    println("Player $i - ${pocket.toUnicodeShortString()}: ${hand.toUnicodeShortString()} - ${hand.score.type}")
-    hands += hand
-  }
-  println()
-
-  val (winner, winningHand) = hands.withIndex().maxBy { it.value.score }!!
-
-  if (hands.count { it.score.score == winningHand.score.score } > 1) {
-    println("Tie")
-    hands.withIndex()
-      .filter { it.value.score.score == winningHand.score.score }
-      .forEach { println("Player ${it.index} wins! ${it.value.toUnicodeShortString()} - ${it.value.score.type}") }
-  } else {
-    println("Player $winner wins! ${winningHand.toUnicodeShortString()} - ${winningHand.score.type}")
+  winners.forEach {
+    val share = game.pot / winners.size
+    println("Share: $share")
+    println(
+      "${it.player.name} (chips: ${it.player.chips + share}) - ${sort(
+        it.hand.cards
+      ).toUnicodeShortString()} ${it.hand.score.type}"
+    )
   }
 }
 
+fun printPreFlop(game: HoldemGame) {
+  println("Pre-flop")
+  println()
+}
 
-fun printCards(cards: List<Card>) = println(cards.map { it.toUnicodeShortString() })
+fun printFlop(game: HoldemGame) {
+  println("Flop")
+  println(game.flop?.toUnicodeShortString())
+  println()
+}
+
+fun printTurn(game: HoldemGame) {
+  println("Turn")
+  println(listOf(game.turn?.toUnicodeShortString()))
+  println()
+}
+
+fun printRiver(game: HoldemGame) {
+  println("River")
+  println(listOf(game.river?.toUnicodeShortString()))
+  println()
+}
+
+fun printBoard(game: HoldemGame) {
+  println("Board")
+  println(game.communityCards.toUnicodeShortString())
+  println()
+  println("Showdown")
+  game.players.forEach { println("${it.pocket.toUnicodeShortString()} - ${it.name}") }
+  println()
+}
+
+fun betWithUser(user: Player): (HoldemGame, Player, Set<BetType>, Int) -> Bet {
+  return { game, player, types, minBet ->
+    if (user.name == player.name) {
+      if (game.communityCards.isNotEmpty()) {
+        println("The board: ${game.communityCards.toUnicodeShortString()}")
+      }
+      println("Your pocket: ${player.pocket.cards.toUnicodeShortString()}")
+      println("The pot: ${game.pot}")
+      println("Bet amount? (chips: ${player.chips})")
+      val bet = Bet(BetType.RAISE, readLine()!!.toInt())
+      println()
+      println("${player.name} bets ${bet.value} (chips: ${player.chips - bet.value})")
+      println()
+      bet
+    } else {
+      bet(game, player, types, minBet)
+    }
+  }
+}
+
+fun bet(game: HoldemGame, player: Player, types: Set<BetType>, min: Int): Bet {
+  println("Pot: ${game.pot}")
+  val bet = Bet(BetType.RAISE, if (min == 0) game.bigBlind * 2 else min * 2)
+  println("${player.name} bets ${bet.value} (chips: ${player.chips - bet.value})")
+  println()
+  return bet
+}
+
+fun List<Card>.toUnicodeShortString() = this.map { it.toUnicodeShortString() }
